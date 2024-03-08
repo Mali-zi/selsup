@@ -15,7 +15,6 @@ export const schema = yup
     init: yup
       .string()
       .min(3, 'Init must be at least 3 characters long')
-      .max(10, 'Init must not be more than 10 characters long')
       .required('Init is required'),
   })
   .required();

@@ -2,14 +2,15 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { schema } from '../utils/Schema';
-import { Props, IFormInput, Param } from '../utils/interfaces';
+import { Props, IFormInput } from '../utils/interfaces';
 
 export default function EditParams(props: Props) {
-  console.log('params', props);
-
   const [params, setParams] = useState(props.params);
   const [model, setModel] = useState({ ...props.model });
   const [paramsEditVisible, setParamsEditVisible] = useState(false);
+  const [modelVisible, setModelVisible] = useState(false);
+  const [showEditModel, setShowEditModel] = useState(false);
+  const [showAddParam, setShowAddParam] = useState(false);
 
   const { register, handleSubmit, reset, formState } = useForm<IFormInput>({
     defaultValues: {
@@ -37,59 +38,132 @@ export default function EditParams(props: Props) {
   }, [formState]);
 
   const getModel = () => {
-    console.log('Model');
+    setModelVisible((prev) => !prev);
+    setParamsEditVisible(false);
+    setShowEditModel(false);
+    setShowAddParam(false);
   };
 
   const editModel = () => {
-    console.log('editModel');
+    setShowEditModel((prev) => !prev);
+    setParamsEditVisible(false);
+    setModelVisible(false);
+    setShowAddParam(false);
   };
 
-  const handleChangeName = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
-    const filterParams = params.filter((a) => a.id !== id);
-    const param = params.filter((a) => a.id === id)[0];
-      setParams([...filterParams, 
-        { ...param, name: e.target.value }
-      ]);
+  const editParams = () => {
+    setParamsEditVisible((prev) => !prev);
+    setModelVisible(false);
+    setShowAddParam(false);
+    setShowEditModel(false);
   };
 
-  const handleChangeType = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setParams({
-      ...params,
-      [e.target.name]: e.target.value,
+  const addParam = () => {
+    setShowAddParam((prev) => !prev);
+    setParamsEditVisible(false);
+    setModelVisible(false);
+    setShowEditModel(false);
+  };
+
+  const handleChangeNameParam = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const newParams = params.map((param, i) => {
+      if (i === index) {
+        return {
+          ...param,
+          name: e.target.value,
+        };
+      } else {
+        return param;
+      }
+    });
+
+    setParams(newParams);
+  };
+
+  const handleChangeParamValue = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
+    Object.keys(model).map((key) => {
+      const curKey = key as keyof typeof model;
+      if (model[curKey] && curKey === 'paramValues') {
+        const newParamValues = model[curKey].map((paramValue) => {
+          if (paramValue.paramId === id) {
+            return {
+              paramId: id,
+              value: e.target.value,
+            };
+          } else {
+            return paramValue;
+          }
+        });
+        setModel((prev) => {
+          return { ...prev, paramValues: newParamValues };
+        });
+      }
     });
   };
 
-  const paramsList = params.map((param) => {
+  const paramsList = params.map((param, index) => {
     const { id, name, type } = param;
-
     return (
       <li key={id}>
         <div className='input-wrapper'>
+          <div className='form-label fw-semibold mb-1'>Тип параметра</div>
+          <div>{type}</div>
           <label htmlFor={`name-${id}`} className='form-label'>
             Имя параметра
           </label>
-          <input id={`name-${id}`} type='text' className='' value={name} onChange={(e) => handleChangeName(e, id)} />
-        </div>
-        <div className='input-wrapper'>
-          <label htmlFor={`type-${param.id}`} className='form-label fw-semibold mb-1'>
-            Тип параметра
-          </label>
-          <select id={`type-${id}`} className='form-control' value={type} onChange={(e) => handleChangeType(e)}>
-            <option value='' disabled>
-              Please Select...
-            </option>
-            <option value='string'>string</option>
-            <option value='number'>number</option>
-            <option value='string[]'>string[]</option>
-          </select>
+          <input
+            id={`name-${id}`}
+            type='text'
+            className=''
+            value={name}
+            onChange={(e) => handleChangeNameParam(e, index)}
+          />
         </div>
       </li>
     );
   });
 
-  return (
-    <div>
-      <h1>Редактор параметров</h1>
+  const editModelList = Object.keys(model).map((key) => {
+    const curKey = key as keyof typeof model;
+    if (model[curKey] && curKey === 'paramValues') {
+      const items = model[curKey].map((paramValue) => {
+        const param = params.filter((p) => p.id === paramValue.paramId)[0];
+        return (
+          <li key={paramValue.paramId}>
+            {param.name}
+            <input
+              id={`name-${paramValue.paramId}`}
+              type='text'
+              className=''
+              value={paramValue.value}
+              onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
+            />
+            {paramValue.value}
+          </li>
+        );
+      });
+      return items;
+    }
+  });
+
+  const modelList = Object.keys(model).map((key) => {
+    const curKey = key as keyof typeof model;
+    if (model[curKey] && curKey === 'paramValues') {
+      const items = model[curKey].map((paramValue) => {
+        const param = params.filter((p) => p.id === paramValue.paramId)[0];
+        return (
+          <li key={paramValue.paramId}>
+            {param.name}
+            {paramValue.value}
+          </li>
+        );
+      });
+      return items;
+    }
+  });
+
+  const addParamList = (
+    <>
       <section className='container vh-100 position-relative'>
         <h2 className='text-primary text-center mt-3'>Добавить новый параметр</h2>
 
@@ -129,25 +203,30 @@ export default function EditParams(props: Props) {
           </div>
         </form>
       </section>
+    </>
+  );
+
+  return (
+    <div>
+      <h1>Редактор параметров</h1>
 
       <button type='button' onClick={getModel}>
-        Показать Model
+        {modelVisible ? 'Закрыть' : 'Показать Model'}
       </button>
       <button type='button' onClick={editModel}>
-        Редактировать Model
+        {showEditModel ? 'Закрыть' : 'Редактировать Model'}
       </button>
-      <button type='button' onClick={() => setParamsEditVisible((prev) => !prev)}>
-        {paramsEditVisible ? 'Редактировать параметры' : 'Закрыть редактирование'}
+      <button type='button' onClick={editParams}>
+        {!paramsEditVisible ? 'Редактировать параметры' : 'Закрыть'}
+      </button>
+      <button type='button' onClick={addParam}>
+        {!showAddParam ? 'Добавить параметр' : 'Закрыть'}
       </button>
 
-      {!paramsEditVisible ? (
-        <section className='container vh-100 position-relative'>
-          <h2 className='text-primary text-center mt-3'>Редактировать параметры</h2>
-          <ul>{paramsList}</ul>
-        </section>
-      ) : (
-        <></>
-      )}
+      {paramsEditVisible ? <ul>{paramsList}</ul> : <></>}
+      {showEditModel ? <ul>{editModelList}</ul> : <></>}
+      {modelVisible ? <ul>{modelList}</ul> : <></>}
+      {showAddParam ? addParamList : <></>}
     </div>
   );
 }

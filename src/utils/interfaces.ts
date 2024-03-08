@@ -2,11 +2,10 @@ export interface Props {
   params: Param[];
   model: Model;
 }
-
 export interface Param {
   id: number;
   name: string;
-  type: NonNullable<'string' | 'number' | 'string[]'>;
+  type: 'string' | 'number' | 'string[]';
 }
 export interface ParamValue {
   paramId: number;
@@ -20,7 +19,7 @@ export interface Model {
 
 export interface IFormInput {
   name: string;
-  type: NonNullable<'string' | 'number' | 'string[]'>;
+  type: 'string' | 'number' | 'string[]';
   init: string;
 }
 
