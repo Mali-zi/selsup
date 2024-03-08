@@ -101,131 +101,155 @@ export default function EditParams(props: Props) {
     });
   };
 
-  const paramsList = params.map((param, index) => {
-    const { id, name, type } = param;
-    return (
-      <li key={id}>
-        <div className='input-wrapper'>
-          <div className='form-label fw-semibold mb-1'>Тип параметра</div>
-          <div>{type}</div>
-          <label htmlFor={`name-${id}`} className='form-label'>
-            Имя параметра
-          </label>
-          <input
-            id={`name-${id}`}
-            type='text'
-            className=''
-            value={name}
-            onChange={(e) => handleChangeNameParam(e, index)}
-          />
-        </div>
-      </li>
-    );
-  });
+  const paramsList = (
+    <>
+      <h2>Редактировать параметры</h2>
+      <ul className='list'>
+        {params.map((param, index) => {
+          const { id, name, type } = param;
+          return (
+            <li key={id} className='list-item'>
+              <div className='item'>Тип параметра: {type}</div>
+              <label htmlFor={`name-${id}`} className='item'>
+                Имя параметра:
+              </label>
+              <input
+                id={`name-${id}`}
+                type='text'
+                className='item'
+                value={name}
+                onChange={(e) => handleChangeNameParam(e, index)}
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </>
+  );
 
-  const editModelList = Object.keys(model).map((key) => {
-    const curKey = key as keyof typeof model;
-    if (model[curKey] && curKey === 'paramValues') {
-      const items = model[curKey].map((paramValue) => {
-        const param = params.filter((p) => p.id === paramValue.paramId)[0];
-        return (
-          <li key={paramValue.paramId}>
-            {param.name}
-            <input
-              id={`name-${paramValue.paramId}`}
-              type='text'
-              className=''
-              value={paramValue.value}
-              onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
-            />
-            {paramValue.value}
-          </li>
-        );
-      });
-      return items;
-    }
-  });
+  const editModelList = (
+    <>
+      <h2>Редактировать Model</h2>
+      {Object.keys(model).map((key) => {
+        const curKey = key as keyof typeof model;
+        if (model[curKey] && curKey === 'paramValues') {
+          const items = model[curKey].map((paramValue) => {
+            const param = params.filter((p) => p.id === paramValue.paramId)[0];
+            return (
+              <li key={paramValue.paramId} className='list-item'>
+                <div className='item'>{param.name}:</div>
+                <input
+                  id={`name-${paramValue.paramId}`}
+                  type='text'
+                  className='item'
+                  value={paramValue.value}
+                  onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
+                />
+              </li>
+            );
+          });
+          return items;
+        }
+      })}
+    </>
+  );
 
-  const modelList = Object.keys(model).map((key) => {
-    const curKey = key as keyof typeof model;
-    if (model[curKey] && curKey === 'paramValues') {
-      const items = model[curKey].map((paramValue) => {
-        const param = params.filter((p) => p.id === paramValue.paramId)[0];
-        return (
-          <li key={paramValue.paramId}>
-            {param.name}
-            {paramValue.value}
-          </li>
-        );
-      });
-      return items;
-    }
-  });
+  const modelList = (
+    <>
+      <h2>Структура Model</h2>
+      <ul className='list'>
+        {Object.keys(model).map((key) => {
+          const curKey = key as keyof typeof model;
+          if (model[curKey] && curKey === 'paramValues') {
+            const items = model[curKey].map((paramValue) => {
+              const param = params.filter((p) => p.id === paramValue.paramId)[0];
+              return (
+                <li key={paramValue.paramId} className='list-item'>
+                  <div className='item'>{param.name}:</div>
+                  <div className='item'>{paramValue.value}</div>
+                </li>
+              );
+            });
+            return items;
+          }
+        })}
+      </ul>
+    </>
+  );
 
   const addParamList = (
     <>
-      <section className='container vh-100 position-relative'>
-        <h2 className='text-primary text-center mt-3'>Добавить новый параметр</h2>
-
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className='input-wrapper'>
-            <label htmlFor='name' className='form-label fw-semibold mb-1'>
-              Введите имя параметра
-            </label>
-            <input id='name' type='text' className='form-control' {...register('name')} />
-            <div className='form-text text-danger'>{formState.errors.name && formState.errors.name.message}</div>
+      <h2>Добавить новый параметр</h2>
+      <form onSubmit={handleSubmit(onSubmit)} className='list'>
+        <div className='list-item'>
+          <label htmlFor='name' className='item'>
+            Введите имя параметра
+          </label>
+          <div>
+            <input id='name' type='text' className='item' {...register('name')} />
+            <div className='text-danger'>{formState.errors.name && formState.errors.name.message}</div>
           </div>
+        </div>
 
-          <div className='input-wrapper'>
-            <label htmlFor='type' className='form-label fw-semibold mb-1'>
-              Выберите тип параметра
-            </label>
-            <select id='type' className='form-control' {...register('type')}>
-              <option value='' disabled>
-                Please Select...
-              </option>
-              <option value='string'>string</option>
-              <option value='number'>number</option>
-              <option value='string[]'>string[]</option>
-            </select>
-          </div>
+        <div className='list-item'>
+          <label htmlFor='type' className='item'>
+            Выберите тип параметра
+          </label>
+          <select id='type' className='item' {...register('type')}>
+            <option value='' disabled className='select-item'>
+              Please Select...
+            </option>
+            <option value='string' className='select-item'>
+              string
+            </option>
+            <option value='number' className='select-item'>
+              number
+            </option>
+            <option value='string[]' className='select-item'>
+              string[]
+            </option>
+          </select>
+        </div>
 
-          <div className='input-wrapper'>
-            <label htmlFor='init' className='form-label fw-semibold mb-1'>
-              Введите значение параметра
-            </label>
-            <input id='init' type='text' className='form-control' {...register('init')} />
-            <div className='form-text text-danger'>{formState.errors.init && formState.errors.init.message}</div>
+        <div className='list-item'>
+          <label htmlFor='init' className='item'>
+            Введите значение параметра
+          </label>
+          <div>
+            <input id='init' type='text' className='item' {...register('init')} />
+            <div className='text-danger'>{formState.errors.init && formState.errors.init.message}</div>
           </div>
+        </div>
 
-          <div className='text-center'>
-            <input type='submit' value='Сохранить' className='btn btn-primary mb-3' disabled={isDisabled} />
-          </div>
-        </form>
-      </section>
+        <button type='submit' className='btn btn-primary mb-3' disabled={isDisabled}>
+          Сохранить
+        </button>
+      </form>
     </>
   );
 
   return (
-    <div>
+    <div className='main'>
       <h1>Редактор параметров</h1>
 
-      <button type='button' onClick={getModel}>
-        {modelVisible ? 'Закрыть' : 'Показать Model'}
-      </button>
-      <button type='button' onClick={editModel}>
-        {showEditModel ? 'Закрыть' : 'Редактировать Model'}
-      </button>
-      <button type='button' onClick={editParams}>
-        {!paramsEditVisible ? 'Редактировать параметры' : 'Закрыть'}
-      </button>
-      <button type='button' onClick={addParam}>
-        {!showAddParam ? 'Добавить параметр' : 'Закрыть'}
-      </button>
+      <div className='buttons'>
+        <button type='button' onClick={getModel}>
+          {modelVisible ? 'Закрыть' : 'Показать Model'}
+        </button>
+        <button type='button' onClick={editModel}>
+          {showEditModel ? 'Закрыть' : 'Редактировать Model'}
+        </button>
+        <button type='button' onClick={editParams}>
+          {!paramsEditVisible ? 'Редактировать параметры' : 'Закрыть'}
+        </button>
+        <button type='button' onClick={addParam}>
+          {!showAddParam ? 'Добавить параметр' : 'Закрыть'}
+        </button>
+      </div>
 
-      {paramsEditVisible ? <ul>{paramsList}</ul> : <></>}
-      {showEditModel ? <ul>{editModelList}</ul> : <></>}
-      {modelVisible ? <ul>{modelList}</ul> : <></>}
+      {paramsEditVisible ? paramsList : <></>}
+      {showEditModel ? editModelList : <></>}
+      {modelVisible ? modelList : <></>}
       {showAddParam ? addParamList : <></>}
     </div>
   );

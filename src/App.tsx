@@ -1,4 +1,5 @@
 import './App.css';
+import './components/EditParams.css';
 import EditParams from './components/EditParams';
 import { Model, Param } from './utils/interfaces';
 
@@ -29,16 +30,7 @@ function App() {
     ],
   } as Model;
 
-  const props = {
-    params: params,
-    model: model,
-  };
-
-  return (
-    <div>
-      <EditParams params={params} model={model} />
-    </div>
-  );
+  return <EditParams params={params} model={model} />;
 }
 
 export default App;
