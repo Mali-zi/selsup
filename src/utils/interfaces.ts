@@ -9,7 +9,7 @@ export interface Param {
 }
 export interface ParamValue {
   paramId: number;
-  value: string;
+  value: string | number | string[];
 }
 
 export interface Model {
@@ -22,4 +22,3 @@ export interface IFormInput {
   type: 'string' | 'number' | 'string[]';
   init: string;
 }
-

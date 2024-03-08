@@ -26,6 +26,39 @@ export default function EditParams(props: Props) {
 
   const onSubmit = (data: IFormInput): void => {
     console.log('data', data);
+    const id = Date.now();
+    let init: string | number | string[] = data.init.trim();
+    if (data.type === 'number') {
+      init = Number(data.init.trim());
+    }
+
+    if (data.type === 'string[]') {
+      init = data.init.split(',').map((item) => item.trim());
+    }
+
+    setParams((prev) => {
+      return [
+        ...prev,
+        {
+          id: id,
+          name: data.name,
+          type: data.type,
+        },
+      ];
+    });
+    setModel((prev) => {
+      const newParamValues = [
+        ...prev.paramValues,
+        {
+          paramId: id,
+          value: init,
+        },
+      ];
+      return {
+        ...prev,
+        paramValues: newParamValues,
+      };
+    });
     reset();
   };
 
