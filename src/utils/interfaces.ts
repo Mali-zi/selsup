@@ -22,3 +22,8 @@ export interface IFormInput {
   type: 'string' | 'number' | 'string[]';
   init: string;
 }
+
+export interface IError {
+  id: number;
+  err: string;
+}

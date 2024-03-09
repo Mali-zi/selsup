@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { schema } from '../utils/Schema';
 import { Props, IFormInput } from '../utils/interfaces';
+import EditModel from './EditModel';
 
 export default function EditParams(props: Props) {
   const [params, setParams] = useState(props.params);
@@ -119,16 +120,50 @@ export default function EditParams(props: Props) {
       if (model[curKey] && curKey === 'paramValues') {
         const newParamValues = model[curKey].map((paramValue) => {
           if (paramValue.paramId === id) {
-            return {
-              paramId: id,
-              value: e.target.value,
-            };
+            const param = params.filter((param) => param.id === id)[0];
+            if (param.type === 'string') {
+              return {
+                paramId: id,
+                value: e.target.value.trim(),
+              };
+            }
+
+            if (param.type === 'number') {
+              const newValue = Number(e.target.value.trim());
+
+              
+              if (!isNaN(newValue)) {
+                return {
+                  paramId: id,
+                  value: newValue,
+                };
+              } else {
+                return {
+                  paramId: id,
+                  value: 'Ошибка!!!',
+                };
+              }
+              
+            }
+
+            if (param.type === 'string[]') {
+              return {
+                paramId: id,
+                value: e.target.value.split(',').map((item) => item.trim())
+              };
+            }
+
+            return paramValue;
           } else {
             return paramValue;
           }
         });
         setModel((prev) => {
-          return { ...prev, paramValues: newParamValues };
+          return (
+            { 
+              ...prev, 
+              paramValues: newParamValues }
+          );
         });
       }
     });
@@ -168,45 +203,41 @@ export default function EditParams(props: Props) {
         if (model[curKey] && curKey === 'paramValues') {
           const items = model[curKey].map((paramValue) => {
             const param = params.filter((p) => p.id === paramValue.paramId)[0];
-            return (
-              <li key={paramValue.paramId} className='list-item'>
-                <div className='item'>{param.name}:</div>
-                <input
-                  id={`name-${paramValue.paramId}`}
-                  type='text'
-                  className='item'
-                  value={paramValue.value}
-                  onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
-                />
-              </li>
-            );
-          });
-          return items;
-        }
-      })}
-    </>
-  );
 
-  const modelList = (
-    <>
-      <h2>Структура Model</h2>
-      <ul className='list'>
-        {Object.keys(model).map((key) => {
-          const curKey = key as keyof typeof model;
-          if (model[curKey] && curKey === 'paramValues') {
-            const items = model[curKey].map((paramValue) => {
-              const param = params.filter((p) => p.id === paramValue.paramId)[0];
+            if (param.type === 'string' || param.type === 'number') {
               return (
                 <li key={paramValue.paramId} className='list-item'>
                   <div className='item'>{param.name}:</div>
-                  <div className='item'>{paramValue.value}</div>
+                  <input
+                    id={`name-${paramValue.paramId}`}
+                    type='text'
+                    className='item'
+                    value={String(paramValue.value)}
+                    onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
+                  />
                 </li>
               );
-            });
-            return items;
-          }
-        })}
-      </ul>
+            }
+
+            if (param.type === 'string[]' && Array.isArray(paramValue.value)) {
+              return (
+                <li key={paramValue.paramId} className='list-item'>
+                  <div className='item'>{param.name}:</div>
+                  <input
+                    id={`name-${paramValue.paramId}`}
+                    type='text'
+                    className='item'
+                    value={paramValue.value.join(', ')}
+                    onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
+                  />
+                </li>
+              );
+            }
+          });
+
+          return items;
+        }
+      })}
     </>
   );
 
@@ -282,7 +313,9 @@ export default function EditParams(props: Props) {
 
       {paramsEditVisible ? paramsList : <></>}
       {showEditModel ? editModelList : <></>}
-      {modelVisible ? modelList : <></>}
+      {showEditModel ? <EditModel params={params} model={model} /> : <></>}
+      
+      {modelVisible ? <pre className='pre'>{JSON.stringify(model, null, 2)}</pre> : <></>}
       {showAddParam ? addParamList : <></>}
     </div>
   );

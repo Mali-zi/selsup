@@ -13,7 +13,7 @@ function App() {
     {
       id: 2,
       name: 'Длина',
-      type: 'number',
+      type: 'string',
     },
   ] as Param[];
 

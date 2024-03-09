@@ -64,3 +64,6 @@ button:focus,
 button:focus-visible {
   background-color: #5622ef;
 }
+button:disabled {
+  background-color: #625a7a;
+}
