@@ -4,13 +4,11 @@ import { IError, Props } from '../utils/interfaces';
 export default function EditModel(props: Props) {
   const [formData, setFormData] = useState(props.model);
   const initErrors = props.params.map((param) => {
-    return (
-      {
-        id: param.id,
-        err: '',
-      }
-    )
-  })
+    return {
+      id: param.id,
+      err: '',
+    };
+  });
   const [formErrors, setFormErrors] = useState<IError[]>(initErrors);
   const [model, setModel] = useState(props.model);
   const isFormValid = Object.values(formErrors).every((formError) => formError.err === '');
@@ -69,7 +67,6 @@ export default function EditModel(props: Props) {
         });
       }
     });
-
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -99,26 +96,26 @@ export default function EditModel(props: Props) {
                 <label htmlFor={`${paramValue.paramId}`} className='item'>
                   {param.name}:
                 </label>
-                <input
-                  id={`${paramValue.paramId}`}
-                  type='text'
-                  name={`${paramValue.paramId}`}
-                  className='item'
-                  value={
-                    param.type === 'string[]' && Array.isArray(paramValue.value)
-                      ? paramValue.value.join(', ')
-                      : paramValue.value
-                  }
-                  onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
-                />
-                {param.type === 'number' && formError && formError.err.length > 0 && (
-                  <p className='error'>{formError.err}</p>
-                )}
+                <div className='list-input'>
+                  <input
+                    id={`${paramValue.paramId}`}
+                    type='text'
+                    name={`${paramValue.paramId}`}
+                    className='item'
+                    value={
+                      param.type === 'string[]' && Array.isArray(paramValue.value)
+                        ? paramValue.value.join(', ')
+                        : paramValue.value
+                    }
+                    onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
+                  />
+                  {param.type === 'number' && formError.err.length > 0 && <div className='text-danger'>{formError.err}</div>}
+                </div>
               </li>
             );
           });
 
-          return <ul>{items}</ul>;
+          return <ul className='list'>{items}</ul>;
         }
       })}
 
