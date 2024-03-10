@@ -115,7 +115,7 @@ export default function EditModel(props: EditModelProps) {
       </ul>
 
       <button type='submit' disabled={!isFormValid}>
-        Submit
+        Сохранить
       </button>
     </form>
   );
