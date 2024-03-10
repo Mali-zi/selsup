@@ -11,7 +11,6 @@ export default function EditModel(props: EditModelProps) {
   });
   const [formErrors, setFormErrors] = useState<IError[]>(initErrors);
   const isFormValid = Object.values(formErrors).every((formError) => formError.err === '');
-  console.log('isFormValid', isFormValid);
 
   const handleChangeParamValue = (e: React.ChangeEvent<HTMLInputElement>, id: number) => {
     Object.keys(formData).map((key) => {
@@ -69,7 +68,6 @@ export default function EditModel(props: EditModelProps) {
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log('formData', formData);
     e.preventDefault();
     props.setShowEditModel(false);
     props.setModel(formData);

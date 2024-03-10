@@ -1,30 +1,9 @@
-# React + TypeScript + Vite
+# Selsup App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Реализовано SPA с React компонентами, которые позволяют редактировать структуру Model. Значения параметров выводятся все и сразу доступны для редактирования.
 
-Currently, two official plugins are available:
+Полную структуру позволяет получить метод getModel().
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Решение может быть легко расширяемым и позволяет легко добавлять новые типы параметров – не только текстовые, но также числовые или со списком значений. Предусматривается валидация для вводимых значений типа number.
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
-```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+- [Deploy](https://mali-zi-selsup.netlify.app)
