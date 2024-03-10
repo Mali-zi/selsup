@@ -121,7 +121,9 @@ export default function AddParam({ setParams, setModel, setShowAddParam }: AddPa
 
         <div className='list-item'>
           <label htmlFor='init' className='item'>
-            Введите значение параметра
+            {formData.type === 'number' && 'Введите числовое значение'}
+            {formData.type === 'string' && 'Введите строковое значение'}
+            {formData.type === 'string[]' && 'Введите значения через запятую'}
           </label>
           <div>
             <input
