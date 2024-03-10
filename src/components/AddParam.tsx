@@ -1,39 +1,30 @@
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import { schema } from '../utils/Schema';
-import { IFormInput, Param, ParamValue } from '../utils/interfaces';
+import { useState } from 'react';
+import { AddParamProps, IFormInput } from '../utils/interfaces';
 
-export interface AddParamProps {
-  setParams: React.Dispatch<React.SetStateAction<Param[]>>;
-  setModel: React.Dispatch<React.SetStateAction<{
-    paramValues: ParamValue[];
-    colors?: string[] | undefined;
-}>>;
-}
-
-export default function AddParam({setParams, setModel}: AddParamProps) {
-  const { register, handleSubmit, reset, formState } = useForm<IFormInput>({
-    defaultValues: {
-      name: '',
-      type: 'string',
-      init: '',
-    },
-    mode: 'onChange',
-    resolver: yupResolver(schema),
+export default function AddParam({ setParams, setModel, setShowAddParam }: AddParamProps) {
+  const [formData, setFormData] = useState<IFormInput>({
+    name: '',
+    type: 'string',
+    init: '',
   });
+  const [dataError, setDataError] = useState({
+    name: '',
+    type: '',
+    init: '',
+  });
+  const isFormValid = Object.values(dataError).every((error) => error === '');
 
-  const [isDisabled, setIsDisabled] = useState(true);
-
-  const onSubmit = (data: IFormInput): void => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setShowAddParam(false);
     const id = Date.now();
-    let init: string | number | string[] = data.init.trim();
-    if (data.type === 'number') {
-      init = Number(data.init.trim());
+    let init: string | number | string[] = formData.init.trim();
+    if (formData.type === 'number') {
+      init = Number(formData.init.trim());
     }
 
-    if (data.type === 'string[]') {
-      init = data.init.split(',').map((item) => item.trim());
+    if (formData.type === 'string[]') {
+      init = formData.init.split(',').map((item) => item.trim());
     }
 
     setParams((prev) => {
@@ -41,8 +32,8 @@ export default function AddParam({setParams, setModel}: AddParamProps) {
         ...prev,
         {
           id: id,
-          name: data.name,
-          type: data.type,
+          name: formData.name,
+          type: formData.type,
         },
       ];
     });
@@ -59,28 +50,52 @@ export default function AddParam({setParams, setModel}: AddParamProps) {
         paramValues: newParamValues,
       };
     });
-    reset();
   };
 
-  useEffect(() => {
-    if (formState.isValid) {
-      setIsDisabled(false);
-    } else {
-      setIsDisabled(true);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    if (formData.type === 'number' && name === 'init') {
+      const newValue = Number(value.trim());
+      if (isNaN(newValue)) {
+        setDataError((prev) => {
+          return {
+            ...prev,
+            init: 'Ошибка: значение должно быть числом.',
+          };
+        });
+      } else {
+        setDataError((prev) => {
+          return {
+            ...prev,
+            init: '',
+          };
+        });
+      }
     }
-  }, [formState]);
+  };
 
   return (
     <>
       <h2>Добавить новый параметр</h2>
-      <form onSubmit={handleSubmit(onSubmit)} className='list'>
+      <form onSubmit={handleSubmit} className='list'>
         <div className='list-item'>
           <label htmlFor='name' className='item'>
             Введите имя параметра
           </label>
           <div>
-            <input id='name' type='text' className='item' {...register('name')} />
-            <div className='text-danger'>{formState.errors.name && formState.errors.name.message}</div>
+            <input
+              id='name'
+              name='name'
+              type='text'
+              className='item'
+              value={formData.name}
+              onChange={(e) => handleChange(e)}
+            />
+            <div className='text-danger'>{dataError.name.length > 0 && dataError.name}</div>
           </div>
         </div>
 
@@ -88,7 +103,7 @@ export default function AddParam({setParams, setModel}: AddParamProps) {
           <label htmlFor='type' className='item'>
             Выберите тип параметра
           </label>
-          <select id='type' className='item' {...register('type')}>
+          <select id='type' name='type' className='item' value={formData.type} onChange={(e) => handleChange(e)}>
             <option value='' disabled className='select-item'>
               Please Select...
             </option>
@@ -109,15 +124,22 @@ export default function AddParam({setParams, setModel}: AddParamProps) {
             Введите значение параметра
           </label>
           <div>
-            <input id='init' type='text' className='item' {...register('init')} />
-            <div className='text-danger'>{formState.errors.init && formState.errors.init.message}</div>
+            <input
+              id='init'
+              name='init'
+              type='text'
+              className='item'
+              value={formData.init}
+              onChange={(e) => handleChange(e)}
+            />
+            <div className='text-danger'>{dataError.init.length > 0 && dataError.init}</div>
           </div>
         </div>
 
-        <button type='submit' className='btn btn-primary mb-3' disabled={isDisabled}>
+        <button type='submit' disabled={!isFormValid}>
           Сохранить
         </button>
       </form>
     </>
-  )
+  );
 }

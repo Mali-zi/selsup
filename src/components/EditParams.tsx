@@ -101,9 +101,9 @@ export default function EditParams(props: Props) {
       </div>
 
       {paramsEditVisible ? paramsList : <></>}
-      {showEditModel ? <EditModel params={params} model={model} /> : <></>}
+      {showEditModel ? <EditModel params={params} model={model} setModel={setModel} /> : <></>}
       {modelVisible ? <pre className='pre'>{JSON.stringify(model, null, 2)}</pre> : <></>}
-      {showAddParam ? <AddParam setParams={setParams} setModel={setModel} /> : <></>}
+      {showAddParam ? <AddParam setParams={setParams} setModel={setModel} setShowAddParam={setShowAddParam} /> : <></>}
     </div>
   );
 }

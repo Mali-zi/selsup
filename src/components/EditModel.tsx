@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { IError, Props } from '../utils/interfaces';
+import { IError, EditModelProps } from '../utils/interfaces';
 
-export default function EditModel(props: Props) {
+export default function EditModel(props: EditModelProps) {
   const [formData, setFormData] = useState(props.model);
   const initErrors = props.params.map((param) => {
     return {
@@ -10,7 +10,6 @@ export default function EditModel(props: Props) {
     };
   });
   const [formErrors, setFormErrors] = useState<IError[]>(initErrors);
-  const [model, setModel] = useState(props.model);
   const isFormValid = Object.values(formErrors).every((formError) => formError.err === '');
   console.log('isFormValid', isFormValid);
 
@@ -73,7 +72,7 @@ export default function EditModel(props: Props) {
     e.preventDefault();
     console.log('Form submitted successfully!');
 
-    setModel((prev) => {
+    props.setModel((prev) => {
       return {
         ...prev,
         formData,
@@ -84,41 +83,44 @@ export default function EditModel(props: Props) {
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
       <h2>Редактировать Model</h2>
-      {Object.keys(formData).map((key) => {
-        const curKey = key as keyof typeof formData;
-        if (formData[curKey] && curKey === 'paramValues') {
-          const items = formData[curKey].map((paramValue) => {
-            const param = props.params.filter((p) => p.id === paramValue.paramId)[0];
-            const formError = formErrors.filter((a) => a.id === paramValue.paramId)[0];
+      <ul className='list'>
+        {Object.keys(formData).map((key) => {
+          const curKey = key as keyof typeof formData;
+          if (formData[curKey] && curKey === 'paramValues') {
+            const items = formData[curKey].map((paramValue) => {
+              const param = props.params.filter((p) => p.id === paramValue.paramId)[0];
+              const formError = formErrors.filter((a) => a.id === paramValue.paramId)[0];
+              return (
+                <li key={paramValue.paramId} className='list-item'>
+                  <label htmlFor={`${paramValue.paramId}`} className='item'>
+                    {param.name}:
+                  </label>
+                  <div className='list-input'>
+                    <input
+                      id={`${paramValue.paramId}`}
+                      type='text'
+                      name={`${paramValue.paramId}`}
+                      className='item'
+                      value={
+                        param.type === 'string[]' && Array.isArray(paramValue.value)
+                          ? paramValue.value.join(', ')
+                          : paramValue.value
+                      }
+                      onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
+                    />
+                    {param.type === 'number' && formError.err.length > 0 && (
+                      <div className='text-danger'>{formError.err}</div>
+                    )}
+                  </div>
+                </li>
+              );
+            });
 
-            return (
-              <li key={paramValue.paramId} className='list-item'>
-                <label htmlFor={`${paramValue.paramId}`} className='item'>
-                  {param.name}:
-                </label>
-                <div className='list-input'>
-                  <input
-                    id={`${paramValue.paramId}`}
-                    type='text'
-                    name={`${paramValue.paramId}`}
-                    className='item'
-                    value={
-                      param.type === 'string[]' && Array.isArray(paramValue.value)
-                        ? paramValue.value.join(', ')
-                        : paramValue.value
-                    }
-                    onChange={(e) => handleChangeParamValue(e, paramValue.paramId)}
-                  />
-                  {param.type === 'number' && formError.err.length > 0 && <div className='text-danger'>{formError.err}</div>}
-                </div>
-              </li>
-            );
-          });
-
-          return <ul className='list'>{items}</ul>;
-        }
-      })}
-
+            return items;
+          }
+        })}
+      </ul>
+      
       <button type='submit' disabled={!isFormValid}>
         Submit
       </button>

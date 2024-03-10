@@ -23,7 +23,30 @@ export interface IFormInput {
   init: string;
 }
 
+export interface EditModelProps {
+  params: Param[];
+  model: Model;
+  setModel: React.Dispatch<
+    React.SetStateAction<{
+      paramValues: ParamValue[];
+      colors?: string[] | undefined;
+    }>
+  >;
+}
+
+
 export interface IError {
   id: number;
   err: string;
+}
+
+export interface AddParamProps {
+  setParams: React.Dispatch<React.SetStateAction<Param[]>>;
+  setModel: React.Dispatch<
+    React.SetStateAction<{
+      paramValues: ParamValue[];
+      colors?: string[] | undefined;
+    }>
+  >;
+  setShowAddParam: React.Dispatch<React.SetStateAction<boolean>>;
 }
