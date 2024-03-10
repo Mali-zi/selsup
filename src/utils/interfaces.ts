@@ -32,8 +32,8 @@ export interface EditModelProps {
       colors?: string[] | undefined;
     }>
   >;
+  setShowEditModel: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
 
 export interface IError {
   id: number;

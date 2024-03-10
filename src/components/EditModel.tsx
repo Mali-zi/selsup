@@ -69,15 +69,10 @@ export default function EditModel(props: EditModelProps) {
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log('formData', formData);
     e.preventDefault();
-    console.log('Form submitted successfully!');
-
-    props.setModel((prev) => {
-      return {
-        ...prev,
-        formData,
-      };
-    });
+    props.setShowEditModel(false);
+    props.setModel(formData);
   };
 
   return (
@@ -120,7 +115,7 @@ export default function EditModel(props: EditModelProps) {
           }
         })}
       </ul>
-      
+
       <button type='submit' disabled={!isFormValid}>
         Submit
       </button>
